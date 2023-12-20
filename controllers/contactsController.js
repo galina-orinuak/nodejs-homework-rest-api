@@ -1,13 +1,9 @@
 import * as contactsService from "../models/contacts.js";
+
 import { HttpError } from "../helpers/index.js";
+
 import {contactAddSchema, contactUpdateSchema} from "../schemas/contacts-schema.js"
 
-// const contactsService = require("../models/contacts");
-// const { HttpError } = require('../helpers/index');
-// const {
-//   contactAddSchema,
-//   contactUpdateSchema,
-// } = require("../schemas/contacts-schema.js");
 
 const getAll = async (req, res, next) => {
   try {
@@ -24,7 +20,7 @@ const getById = async (req, res, next) => {
     const { id } = req.params;
     const result = await contactsService.getContactById(id);
     if (!result) {
-      throw HttpError(404, `Movie with id=${id} not found`);
+      throw HttpError(404, `Contact with id=${id} not found`);
     }
 
     res.json(result);
@@ -56,7 +52,7 @@ const updateById = async (req, res, next) => {
     const { id } = req.params;
     const result = await contactsService.updateContact(id, req.body);
     if (!result) {
-      throw HttpError(404, `Movie with id=${id} not found`);
+      throw HttpError(404, `Contact with id=${id} not found`);
     }
 
     res.json(result);
@@ -70,7 +66,7 @@ const deleteById = async (req, res, next) => {
     const { id } = req.params;
     const result = await contactsService.removeContact(id);
     if (!result) {
-      throw HttpError(404, `Movie with id=${id} not found`);
+      throw HttpError(404, `Contact with id=${id} not found`);
     }
     res.json({
       message: "Delete success",
