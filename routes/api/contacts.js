@@ -12,7 +12,7 @@ contactsRouter.get('/:id', contactsController.getById)
 
 contactsRouter.post('/', isEmptyBody, contactsController.add)
 
-contactsRouter.delete('/:id', isEmptyBody, contactsController.deleteById)
+contactsRouter.delete('/:id', contactsController.deleteById)
 
 contactsRouter.put('/:id', contactsController.updateById)
 
