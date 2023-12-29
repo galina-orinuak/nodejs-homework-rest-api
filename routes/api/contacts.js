@@ -14,6 +14,6 @@ contactsRouter.post('/', isEmptyBody, contactsController.add)
 
 contactsRouter.delete('/:id', contactsController.deleteById)
 
-contactsRouter.put('/:id', contactsController.updateById)
+contactsRouter.put('/:id', isEmptyBody, contactsController.updateById)
 
 export default contactsRouter;

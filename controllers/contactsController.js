@@ -33,7 +33,7 @@ const getById = async (req, res, next) => {
   try {
     const { error } = contactAddSchema.validate(req.body);
     if (error) {
-      throw HttpError(400, error.message);
+      throw HttpError(400, `missing fields`);
     }
     const result = await contactsService.addContact(req.body);
 
@@ -70,7 +70,7 @@ const deleteById = async (req, res, next) => {
     }
     res.json({
       message: "contact deleted",
-      code: 200
+
     });
   } catch (error) {
     next(error);
