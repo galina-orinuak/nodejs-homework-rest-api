@@ -1,19 +1,51 @@
-// const fs = require('fs/promises')
+import {Schema, model} from "mongoose";
+import Joi from "joi";
 
-const listContacts = async () => {}
+import {handleSaveError, addUpdateSettings} from "./hooks.js";
 
-const getContactById = async (contactId) => {}
+const contactSchema =  new Schema ({
+  name: {
+    type: String,
+    required: [true, 'Set name for contact'],
+  },
+  email: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
+},  {versionKey: false, timestamps: true})
 
-const removeContact = async (contactId) => {}
+contactSchema.post("save", handleSaveError);
+contactSchema.pre ("findOneAndUpdate", addUpdateSettings)
+contactSchema.post("findOneAndUpdate", handleSaveError);
 
-const addContact = async (body) => {}
 
-const updateContact = async (contactId, body) => {}
 
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+
+export const contactAddSchema = Joi.object({
+  name: Joi.string().required().messages({
+      "any.required": `"missing required name field`
+        }), 
+  email: Joi.string().required().messages({
+      "any.required": `"missing required email field`
+        }), 
+  phone: Joi.string().required().messages({
+      "any.required": `"missing required phone field`
+        }), 
+})
+
+export const contactUpdateSchema = Joi.object({
+  name: Joi.string(),
+  email: Joi.string(),
+  phone: Joi.string(),
+  favorite: Joi.boolean(),
+})
+
+const Contact = model("contact", contactSchema);
+
+export default Contact;
