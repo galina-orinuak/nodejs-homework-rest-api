@@ -62,9 +62,7 @@ const logout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.json({
-    message: "Signout success",
-  });
+  res.json();
 };
 
 const current = async(req, res)=> {
