@@ -20,9 +20,8 @@ const register = async (req, res) => {
 
   const newUser = await User.create({ ...req.body, password: hashPassword });
 
-  res.json(
+  res.status(201).json(
    {user: {
-    username: newUser.username,
     email: newUser.email,
     subscription: newUser.subscription
   }});
@@ -62,7 +61,7 @@ const logout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.json();
+  res.status(204).json();
 };
 
 const current = async(req, res)=> {

@@ -30,8 +30,12 @@ userSchema.post("findOneAndUpdate", handleSaveError);
 
 
 export const userRegisterSchema = Joi.object({
-    password: Joi.string().min(6).required(),
-    email: Joi.string().required(),
+    password: Joi.string().min(6).required().messages({
+      "any.required": `missing required password field`
+        }), 
+    email: Joi.string().required().messages({
+      "any.required": `missing required email field`
+        }), 
     subscription: Joi.string()
 
     
