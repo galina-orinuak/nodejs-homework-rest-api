@@ -9,7 +9,7 @@ import User from "../models/user.js";
 import { HttpError } from "../helpers/index.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, ELASTIC_API_KEY } = process.env;
 
 const avatarDes = path.resolve("public", "avatars");
 
@@ -21,10 +21,18 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-
+  const verificationToken = nanoid();
   const avatarURL = gravatar.url(email);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL });
+  const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL, verificationToken});
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verify Email",
+    html: `<a target="_blank" href="${ELASTIC_API_KEY}/api/auth/verify/${verificationToken}">Click here to verify Email</a>`,
+  };
+
+  await sendEmail(verifyEmail);
 
   res.status(201).json(
    {user: {
@@ -101,10 +109,55 @@ const current = async(req, res)=> {
     });
   };
 
+  const verify = async (req, res) => {
+    const { verificationToken } = req.params;
+    const user = await User.findOne({ verificationToken });
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+    await User.findByIdAndUpdate(user._id, {
+      verificationToken: "",
+      verify: true,
+    });
+  
+    res.status(200).json({
+      message: "Verification successful",
+    });
+  };
+
+
+  const resetVerify = async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+  
+    if (!user) {
+      throw HttpError(401);
+    }
+  
+    if (user.verify) {
+      throw HttpError(400, "Verification has already been passed");
+    }
+  
+    const verifyEmail = {
+      to: email,
+      subject: "Verify Email",
+      html: `<a target="_blank" href="${ELASTIC_API_KEY}/api/auth/verify/${user.verificationToken}">Click here to verify Email</a>`,
+    };
+  
+    await sendEmail(verifyEmail);
+  
+    res.status(200).json({
+      message: "Verification email sent",
+    });
+  
+  };
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   current: ctrlWrapper(current),
-  patchAvatar: ctrlWrapper(patchAvatar)
+  patchAvatar: ctrlWrapper(patchAvatar),
+  verify: ctrlWrapper(verify),
+  resetVerify: ctrlWrapper(resetVerify)
 };
