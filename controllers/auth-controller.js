@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
 import Jimp from "jimp";
 import path from "path";
+import { nanoid } from "nanoid";
 
 import User from "../models/user.js";
 
